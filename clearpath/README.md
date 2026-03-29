@@ -5,12 +5,12 @@
 - Full SQLite database tracking every patient
 - End-to-end system: patient app + hospital OS in one
 
-Hospitals are terrifying. You're scared, you don't speak the language, you don't know where to go, you don't know how long you'll wait. ClearPath solves all of that in 60 seconds. 
+Hospitals are terrifying. You don't speak the language, you don't know where to go, you don't know how long you'll wait. Every other system gives you a form. ClearPath gives you a conversation. 
 
 Features:
 
 User App: 
-    * Natural language symptom intake with automatic language detection
+    * Natural language diagnostic conversation with automatic language detection
     * AI routing to the right department + check-in 
     * Interactive hospital map with animated route and directions
     * Live queue position with estimated wait time via WebSocket
@@ -18,8 +18,9 @@ User App:
     * Discharge screen + AI-generated discharge follow-up instructions
 
 Staff Dashboard:
-    * Real-time patient list across all 11 departments
-    * Live WebSocket connection indicator
+    * Patient sentiment tracking with real-time list
+    * AI-generated shift handoff summary
+    * Stuck patient detection
     * Call next patient → instantly updates patient's phone
     * Move patient between departments
     * Discharge patient with custom instructions

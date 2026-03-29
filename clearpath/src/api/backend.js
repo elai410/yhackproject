@@ -58,19 +58,49 @@ export async function movePatient(id, department, room, floor) {
   return res.json();
 }
 
+export async function updateStatus(id, status) {
+  const res = await fetch(`${API}/api/update-status/${id}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status }),
+  });
+  if (!res.ok) throw new Error("Status update failed");
+  return res.json();
+}
+
 export const DEPT_ROOM = {
-  rabies:     { room: "Room A3",            floor: "1" },
-  emergency:  { room: "South Pavilion",     floor: "1" },
-  pediatric:  { room: "Children's Hospital",floor: "1" },
-  triage:     { room: "East Pavilion",      floor: "1" },
-  atrium:     { room: "Atrium",             floor: "1" },
-  clinicbldg: { room: "Clinic Building",    floor: "1" },
-  dana:       { room: "Dana Building",      floor: "1" },
-  ypb:        { room: "Yale Physicians",    floor: "1" },
-  north:      { room: "North Pavilion",     floor: "1" },
-  fitkin:     { room: "Fitkin Building",    floor: "2" },
-  winchester: { room: "Winchester Building",floor: "1" },
+  rabies:     { room: "Room A3",             floor: "1" },
+  emergency:  { room: "South Pavilion",      floor: "1" },
+  pediatric:  { room: "Children's Hospital", floor: "1" },
+  triage:     { room: "East Pavilion",       floor: "1" },
+  atrium:     { room: "Atrium",              floor: "1" },
+  clinicbldg: { room: "Clinic Building",     floor: "1" },
+  dana:       { room: "Dana Building",       floor: "1" },
+  ypb:        { room: "Yale Physicians",     floor: "1" },
+  north:      { room: "North Pavilion",      floor: "1" },
+  fitkin:     { room: "Fitkin Building",     floor: "2" },
+  winchester: { room: "Winchester Building", floor: "1" },
 };
 
-export const WS_URL = "ws://localhost:3001";
+export const STATUS_LABELS = {
+  waiting:           "Waiting",
+  in_progress:       "In progress",
+  pending_test:      "Pending test",
+  pending_signature: "Pending signature",
+  pending_transport: "Pending transport",
+  pending_bed:       "Pending bed",
+  called:            "Called",
+};
+
+export const STATUS_COLORS = {
+  waiting:           { bg: "#f1f5f9", color: "#64748b" },
+  in_progress:       { bg: "#dcfce7", color: "#15803d" },
+  pending_test:      { bg: "#e0f2fe", color: "#0369a1" },
+  pending_signature: { bg: "#fef9c3", color: "#a16207" },
+  pending_transport: { bg: "#f3e8ff", color: "#7e22ce" },
+  pending_bed:       { bg: "#ffedd5", color: "#c2410c" },
+  called:            { bg: "#ede9fe", color: "#6d28d9" },
+};
+
+export const WS_URL  = "ws://localhost:3001";
 export const API_URL = API;
