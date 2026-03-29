@@ -1,5 +1,6 @@
-ClearPath is an AI-powered patient journey system that guides people from 'I need help' to 'I'm walking out the door' — in any language.
+**ClearPath** - an AI-powered patient journey system
 
+It guides people from '*I need help*' to '*I'm walking out the door*' — in any language 
 - Real-time WebSocket architecture — two screens talking to each other live
 - Claude AI doing natural language triage in any language
 - Full SQLite database tracking every patient
@@ -7,35 +8,31 @@ ClearPath is an AI-powered patient journey system that guides people from 'I nee
 
 Hospitals are terrifying. You don't speak the language, you don't know where to go, you don't know how long you'll wait. Every other system gives you a form. ClearPath gives you a conversation. 
 
-Features:
+**Description**
+Patient App
+* Conversational AI triage — ClearPath asks follow-up questions like a real nurse before routing, in any language
+* Automatic language detection — no dropdowns, no selection, the entire UI adapts to whatever language the patient speaks
+* AI-generated personalized follow-up message at discharge
+* Interactive hospital map with animated walking directions and QR code check-in
+* Live queue position with real-time updates via WebSocket
+* Status-aware waiting screen — patients see exactly what's happening ("Your test is in progress", "Transport is on the way")
+* Instant alert pushed directly from staff
 
-User App: 
-    * Natural language diagnostic conversation with automatic language detection
-    * AI routing to the right department + check-in 
-    * Interactive hospital map with animated route and directions
-    * Live queue position with estimated wait time via WebSocket
-    * "It's your turn" alert pushed from staff dashboard
-    * Discharge screen + AI-generated discharge follow-up instructions
+Staff Dashboard
+* Patient sentiment tracking — ClearPath flags emotional state during intake ("Patient is scared and traveling alone")
+* Stuck patient detection — automatically flags patients who have been in a status too long, sorted to the top
+* Full status system — waiting, in progress, pending test, pending signature, pending transport, pending bed
+* Status changes push instant notifications to the patient's phone
+* Call next patient, move between departments, discharge with custom instructions
+* AI-generated shift handoff summary — one click generates a clinical briefing for the incoming team
+* Search, filter by department, urgency badges, language badges
 
-Staff Dashboard:
-    * Patient sentiment tracking with real-time list
-    * AI-generated shift handoff summary
-    * Stuck patient detection
-    * Call next patient → instantly updates patient's phone
-    * Move patient between departments
-    * Discharge patient with custom instructions
-    * Search and filter by department
-    * Urgency badges (high/medium/low)
-    * Language detection badge on each patient card
-
-Analytics Page:
-    * Total patients today
-    * Currently waiting count
-    * Discharged today count
-    * Languages spoken
-    * Patient volume by hour chart
-    * Average wait time by department
-    * Urgency breakdown
+Analytics Page
+* Live patient volume by hour
+* Average wait time per department
+* Urgency breakdown across all patients
+* Languages spoken today
+* Total checked in, currently waiting, and discharged counts
 
 
 # React + Vite
