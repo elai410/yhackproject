@@ -9,6 +9,7 @@ It guides people from '*I need help*' to '*I'm walking out the door*' — in any
 Hospitals are terrifying. You don't speak the language, you don't know where to go, you don't know how long you'll wait. Every other system gives you a form. ClearPath gives you a conversation. 
 
 **Description**
+
 Patient App
 * Conversational AI triage — ClearPath asks follow-up questions like a real nurse before routing, in any language
 * Automatic language detection — no dropdowns, no selection, the entire UI adapts to whatever language the patient speaks
