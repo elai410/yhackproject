@@ -1,22 +1,5 @@
 import "dotenv/config";
 
-import twilio from "twilio";
-const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-
-async function sendSMS(to, message) {
-  if (!to || !to.trim()) return;
-  try {
-    await twilioClient.messages.create({
-      body: message,
-      from: process.env.TWILIO_PHONE_NUMBER,
-      to,
-    });
-    console.log(`SMS sent to ${to}`);
-  } catch (e) {
-    console.error("SMS failed:", e.message);
-  }
-}
-
 import express from "express";
 import http from "http";
 import { WebSocketServer } from "ws";
@@ -111,8 +94,6 @@ app.post("/api/checkin", async (req, res) => {
   const patient = db.prepare(`SELECT * FROM patients WHERE id=?`).get(id);
   broadcast({ type: "PATIENT_JOINED", patient, queue: getAllPatients() });
 
-  await sendSMS(phone, `Hi ${name || "there"}! You're checked in at ClearPath. You're #${count + 1} in line at the ${department} clinic. We'll text you when it's your turn.`);
-
   res.json({ success: true, patient });
 });
 
@@ -144,8 +125,6 @@ app.post("/api/call-next/:department", async(req, res) => {
 
   const updated = db.prepare(`SELECT * FROM patients WHERE id=?`).get(next.id);
   notifyPatient(next.id, { type: "YOU_ARE_CALLED", patient: updated });
-
-  await sendSMS(next.phone, `🔔 It's your turn at ClearPath! Please head to Room ${next.room} now.`);
 
   broadcast({ type: "QUEUE_UPDATED", queue: getAllPatients() });
 
