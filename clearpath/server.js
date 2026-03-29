@@ -162,8 +162,10 @@ const PORT = 3001;
 
 // Paste this route into server.js BEFORE the server.listen() line at the bottom
 
+// Replace your existing /api/route endpoint in server.js with this:
+
 app.post("/api/route", async (req, res) => {
-  const { situation, language } = req.body;
+  const { situation } = req.body;
   try {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -174,11 +176,49 @@ app.post("/api/route", async (req, res) => {
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        system: `You are a hospital triage router. Given a patient situation, respond ONLY with a JSON object (no markdown, no backticks) in this format:
-{"department":"rabies|emergency|pediatric|triage","reason":"one sentence why","urgency":"low|medium|high"}
-Departments: rabies=dog/animal bites needing vaccine, emergency=life-threatening, pediatric=children under 12, triage=general illness.
-Respond in the same language the patient used.`,
+        max_tokens: 1500,
+        system: `You are a hospital triage router and translator. Given a patient situation:
+1. Detect the language they are writing in
+2. Route them to the correct department
+3. Translate all UI strings into their language
+
+Respond ONLY with a JSON object (no markdown, no backticks) in this exact format:
+{
+  "department": "rabies|emergency|pediatric|triage",
+  "reason": "one sentence why, in the patient's language",
+  "urgency": "low|medium|high",
+  "detectedLanguage": "English|Spanish|French|Arabic|etc",
+  "ui": {
+    "heading": "What brings you in today? (translated)",
+    "sub": "Describe your situation in your own words. We'll guide you to the right place. (translated)",
+    "btn_route": "Find my care (translated)",
+    "btn_checkin": "Confirm check-in (translated)",
+    "btn_arrived": "I've arrived — show my queue position (translated)",
+    "btn_followup": "Get follow-up reminder (translated)",
+    "label_routed": "You've been routed to (translated)",
+    "label_position": "Your position (translated)",
+    "label_queue": "in line at (translated)",
+    "label_wait": "Estimated wait (translated)",
+    "label_directions": "Walking directions (translated)",
+    "label_qr": "Your check-in QR (translated)",
+    "label_discharge": "Discharge instructions (translated)",
+    "label_followup_card": "Your 3-day follow-up reminder (translated)",
+    "label_name": "Your name (optional) (translated)",
+    "label_phone": "Phone for SMS alerts (optional) (translated)",
+    "alert_turn": "It's your turn! (translated)",
+    "alert_room": "Please head to Room (translated)",
+    "alert_wait_msg": "We'll alert you when it's almost your turn. You don't need to stay glued to this screen. (translated)",
+    "allset": "You're all set! (translated)",
+    "thank_you": "Thank you for visiting ClearPath (translated)",
+    "directions": ["Enter through the main entrance (translated)", "Follow the blue line on the floor (translated)", "Take the corridor (translated)", "Look for your room (translated)"],
+    "expect": ["Show your QR code or give your name at the desk (translated)", "A nurse will take your vitals (translated)", "A doctor will see you shortly after (translated)"],
+    "back": "Back (translated)",
+    "min": "min (translated)",
+    "urgency_label": "urgency (translated)"
+  }
+}
+
+Departments: rabies=dog/animal bites needing vaccine, emergency=life-threatening, pediatric=children under 12, triage=general illness.`,
         messages: [{ role: "user", content: situation }],
       }),
     });
@@ -187,7 +227,15 @@ Respond in the same language the patient used.`,
     const parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
     res.json(parsed);
   } catch (e) {
-    res.status(500).json({ error: "Routing failed", department: "triage", reason: "Please see general triage", urgency: "low" });
+    console.error(e);
+    res.status(500).json({
+      error: "Routing failed",
+      department: "triage",
+      reason: "Please see general triage",
+      urgency: "low",
+      detectedLanguage: "English",
+      ui: null,
+    });
   }
 });
 
