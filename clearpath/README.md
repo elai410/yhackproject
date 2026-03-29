@@ -7,6 +7,36 @@
 
 Hospitals are terrifying. You're scared, you don't speak the language, you don't know where to go, you don't know how long you'll wait. ClearPath solves all of that in 60 seconds. 
 
+Features:
+
+User App: 
+    * Natural language symptom intake with automatic language detection
+    * AI routing to the right department + check-in 
+    * Interactive hospital map with animated route and directions
+    * Live queue position with estimated wait time via WebSocket
+    * "It's your turn" alert pushed from staff dashboard
+    * Discharge screen + AI-generated discharge follow-up instructions
+
+Staff Dashboard:
+    * Real-time patient list across all 11 departments
+    * Live WebSocket connection indicator
+    * Call next patient → instantly updates patient's phone
+    * Move patient between departments
+    * Discharge patient with custom instructions
+    * Search and filter by department
+    * Urgency badges (high/medium/low)
+    * Language detection badge on each patient card
+
+Analytics Page:
+    * Total patients today
+    * Currently waiting count
+    * Discharged today count
+    * Languages spoken
+    * Patient volume by hour chart
+    * Average wait time by department
+    * Urgency breakdown
+
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
