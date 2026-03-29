@@ -1,4 +1,4 @@
-"ClearPath is an AI-powered patient journey system that guides people from 'I need help' to 'I'm walking out the door' — in any language."
+ClearPath is an AI-powered patient journey system that guides people from 'I need help' to 'I'm walking out the door' — in any language.
 
 - Real-time WebSocket architecture — two screens talking to each other live
 - Claude AI doing natural language triage in any language
