@@ -1,3 +1,12 @@
+"ClearPath is an AI-powered patient journey system that guides people from 'I need help' to 'I'm walking out the door' — in any language."
+
+- Real-time WebSocket architecture — two screens talking to each other live
+- Claude AI doing natural language triage in any language
+- Full SQLite database tracking every patient
+- End-to-end system: patient app + hospital OS in one
+
+Hospitals are terrifying. You're scared, you don't speak the language, you don't know where to go, you don't know how long you'll wait. ClearPath solves all of that in 60 seconds. 
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
