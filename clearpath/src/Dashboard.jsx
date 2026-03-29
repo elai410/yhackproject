@@ -1,14 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import PatientCard from "./components/PatientCard.jsx";
-import { fetchAllPatients, callNext, dischargePatient, movePatient, WS_URL } from "./api/backend.js";
+import { fetchAllPatients, callNext, dischargePatient, movePatient, DEPT_ROOM, WS_URL } from "./api/backend.js";
 import { DEPT_COLORS, DEPT_LIST, DEPT_NAMES } from "./constants.js";
-
-const DEPT_ROOM = {
-  rabies:    { room: "A3", floor: "1" },
-  emergency: { room: "B1", floor: "2" },
-  pediatric: { room: "B4", floor: "2" },
-  triage:    { room: "A1", floor: "1" },
-};
 
 export default function Dashboard() {
   const [patients, setPatients]   = useState([]);
@@ -24,10 +17,7 @@ export default function Dashboard() {
     ws.onclose   = () => setConnected(false);
     ws.onmessage = (e) => {
       const msg = JSON.parse(e.data);
-      if (msg.type === "QUEUE_UPDATED" || msg.type === "PATIENT_JOINED") {
-        setPatients(msg.queue || []);
-        loadPatients();
-      }
+      if (msg.type === "QUEUE_UPDATED" || msg.type === "PATIENT_JOINED") loadPatients();
     };
     wsRef.current = ws;
     return () => ws.close();
@@ -49,7 +39,7 @@ export default function Dashboard() {
 
   async function handleMove(id, department) {
     if (!department) return;
-    const d = DEPT_ROOM[department] || { room: "A1", floor: "1" };
+    const d = DEPT_ROOM[department] || { room: "East Pavilion", floor: "1" };
     await movePatient(id, department, d.room, d.floor);
     loadPatients();
   }
@@ -79,16 +69,17 @@ export default function Dashboard() {
         </span>
       </header>
 
+      {/* Stats grid — scrollable row */}
       <div style={S.statsRow}>
         {stats.map(s => {
-          const c = DEPT_COLORS[s.id];
+          const c = DEPT_COLORS[s.id] || { bg: "#f1f5f9", border: "#94a3b8", text: "#334155" };
           return (
             <div key={s.id}
               onClick={() => setFilter(filter === s.id ? "all" : s.id)}
               style={{ ...S.statCard, borderTop: `3px solid ${c.border}`, cursor: "pointer", background: filter === s.id ? c.bg : "#fff" }}>
-              <div style={{ fontSize: 28, fontWeight: 800, color: c.text }}>{s.count}</div>
-              <div style={{ fontSize: 12, color: "#64748b", fontWeight: 600 }}>{s.name}</div>
-              {s.high > 0 && <div style={{ fontSize: 11, color: "#b91c1c", marginTop: 2 }}>⚠ {s.high} high urgency</div>}
+              <div style={{ fontSize: 24, fontWeight: 800, color: c.text }}>{s.count}</div>
+              <div style={{ fontSize: 11, color: "#64748b", fontWeight: 600, lineHeight: 1.3 }}>{s.name}</div>
+              {s.high > 0 && <div style={{ fontSize: 10, color: "#b91c1c", marginTop: 2 }}>⚠ {s.high} high</div>}
             </div>
           );
         })}
@@ -126,8 +117,8 @@ const S = {
   logo:       { fontSize: 22, color: "#3B8BD4", fontWeight: 700 },
   title:      { flex: 1, fontSize: 18, fontWeight: 700, margin: 0, color: "#0f172a" },
   dot:        { width: 8, height: 8, borderRadius: "50%" },
-  statsRow:   { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, padding: "20px 24px 0" },
-  statCard:   { background: "#fff", borderRadius: 12, padding: 16, boxShadow: "0 1px 3px rgba(0,0,0,0.07)" },
+  statsRow:   { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 12, padding: "20px 24px 0" },
+  statCard:   { background: "#fff", borderRadius: 12, padding: 12, boxShadow: "0 1px 3px rgba(0,0,0,0.07)" },
   toolbar:    { display: "flex", gap: 12, padding: "16px 24px", alignItems: "center" },
   search:     { flex: 1, padding: "8px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 14, fontFamily: "inherit" },
   select:     { padding: "8px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 14, fontFamily: "inherit" },

@@ -176,6 +176,19 @@ const BUILDINGS = [
       "1": "YNHH Main Entrance · 20 York Street",
     },
   },
+  // Rabies clinic — kept as a separate overlay on South Pavilion
+  {
+    id: "rabies",
+    label: "Rabies Clinic",
+    pts: "240,175 310,175 310,225 240,225",
+    cx: 275, cy: 200,
+    color: "#e0f2fe", stroke: "#38bdf8", textColor: "#0369a1", subColor: "#0ea5e9",
+    entries: [{ x: 275, y: 175, dir: "N", label: "South Pavilion — Room A3" }],
+    elevators: [],
+    services: {
+      "1": "Rabies Vaccine Clinic — Room A3",
+    },
+  },
 ];
 
 const CORRIDORS = [
@@ -200,6 +213,7 @@ const WALKWAYS = [
 ];
 
 const PATHS = {
+  rabies:     "M345,562 L345,534 L345,520 L345,355 L345,340 L345,225 L275,225 L275,200",
   emergency:  "M345,562 L345,534 L345,520 L345,355 L345,340",
   pediatric:  "M345,562 L345,534 L345,520 L345,355 L345,285 L145,285 L145,175 L145,92 L420,92",
   triage:     "M345,562 L345,534 L345,520",
@@ -221,9 +235,7 @@ function ElevatorMarker({ x, y, active }) {
         strokeWidth="1"/>
       <text x={x} y={y + 1} textAnchor="middle" dominantBaseline="central"
         fontSize="8" fontWeight="700"
-        fill={active ? "#fff" : "#185FA5"}>
-        E
-      </text>
+        fill={active ? "#fff" : "#185FA5"}>E</text>
     </g>
   );
 }
@@ -233,10 +245,8 @@ function EntryDot({ x, y, dir }) {
   const [dx, dy] = offsets[dir] || [0,-9];
   return (
     <g>
-      <circle cx={x} cy={y} r={4}
-        fill="#dcfce7" stroke="#16a34a" strokeWidth="1.5"/>
-      <line x1={x} y1={y} x2={x+dx} y2={y+dy}
-        stroke="#16a34a" strokeWidth="1.5" strokeLinecap="round"/>
+      <circle cx={x} cy={y} r={4} fill="#dcfce7" stroke="#16a34a" strokeWidth="1.5"/>
+      <line x1={x} y1={y} x2={x+dx} y2={y+dy} stroke="#16a34a" strokeWidth="1.5" strokeLinecap="round"/>
     </g>
   );
 }
@@ -261,9 +271,7 @@ export default function FloorPlan({ activeRoom }) {
             color: floor === f.key ? "#fff" : "#64748b",
             fontSize: 11, cursor: "pointer",
             fontWeight: floor === f.key ? 600 : 400,
-          }}>
-            {f.label}
-          </button>
+          }}>{f.label}</button>
         ))}
       </div>
 
@@ -291,7 +299,7 @@ export default function FloorPlan({ activeRoom }) {
           <path key={i} d={d} fill="none" stroke="#dde3ea" strokeWidth="10" strokeLinecap="round"/>
         ))}
 
-        {/* Walkway bridges — dashed */}
+        {/* Walkways */}
         {WALKWAYS.map((d, i) => (
           <path key={i} d={d} fill="none" stroke="#cbd5e1" strokeWidth="5"
             strokeDasharray="4 3" strokeLinecap="round"/>
@@ -306,42 +314,31 @@ export default function FloorPlan({ activeRoom }) {
 
         {/* Buildings */}
         {BUILDINGS.map((b) => {
-          const isRoute = b.id === activeRoom;
-          const isSel   = b.id === selected;
+          const isRoute  = b.id === activeRoom;
+          const isSel    = b.id === selected;
           const hasFloor = !!b.services[floor];
-
           return (
             <g key={b.id}
               style={{ cursor: hasFloor ? "pointer" : "default" }}
               onClick={() => hasFloor && setSelected(b.id === selected ? null : b.id)}>
-
               <polygon
                 points={b.pts}
                 fill={isRoute ? "#3B8BD4" : isSel ? b.color : hasFloor ? b.color : "#eef0f2"}
                 stroke={isRoute ? "#185FA5" : isSel ? b.stroke : hasFloor ? b.stroke : "#dde3ea"}
                 strokeWidth={isRoute || isSel ? 2.5 : 1}
-                opacity={hasFloor ? 1 : 0.4}
-              />
-
-              {/* Building name */}
+                opacity={hasFloor ? 1 : 0.4}/>
               <text x={b.cx} y={b.cy - 8} textAnchor="middle" dominantBaseline="central"
                 fontSize="11" fontWeight="600"
                 fill={isRoute ? "#fff" : hasFloor ? b.textColor : "#aaa"}>
                 {b.label}
               </text>
-
-              {/* First service on selected floor */}
               <text x={b.cx} y={b.cy + 9} textAnchor="middle" dominantBaseline="central"
                 fontSize="9" fill={isRoute ? "#bfdbfe" : hasFloor ? b.subColor : "#ccc"}>
                 {hasFloor ? b.services[floor].split(",")[0].trim() : "—"}
               </text>
-
-              {/* Entry dots */}
               {hasFloor && b.entries.map((e, i) => (
                 <EntryDot key={i} x={e.x} y={e.y} dir={e.dir}/>
               ))}
-
-              {/* Elevator markers */}
               {hasFloor && b.elevators.map((el, i) => (
                 <ElevatorMarker key={i} x={el.x} y={el.y} active={isRoute || isSel}/>
               ))}

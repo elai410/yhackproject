@@ -179,14 +179,14 @@ app.post("/api/route", async (req, res) => {
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
         max_tokens: 1500,
-        system: `You are a hospital triage router and translator. Given a patient situation:
+        system: `You are a hospital triage router and translator for Yale New Haven Hospital. Given a patient situation:
 1. Detect the language they are writing in
 2. Route them to the correct department
 3. Translate all UI strings into their language
 
 Respond ONLY with a JSON object (no markdown, no backticks) in this exact format:
 {
-  "department": "rabies|emergency|pediatric|triage",
+  "department": "one of the department ids below",
   "reason": "one sentence why, in the patient's language",
   "urgency": "low|medium|high",
   "detectedLanguage": "English|Spanish|French|Arabic|etc",
@@ -208,11 +208,11 @@ Respond ONLY with a JSON object (no markdown, no backticks) in this exact format
     "label_name": "Your name (optional) (translated)",
     "label_phone": "Phone for SMS alerts (optional) (translated)",
     "alert_turn": "It's your turn! (translated)",
-    "alert_room": "Please head to Room (translated)",
+    "alert_room": "Please head to (translated)",
     "alert_wait_msg": "We'll alert you when it's almost your turn. You don't need to stay glued to this screen. (translated)",
     "allset": "You're all set! (translated)",
     "thank_you": "Thank you for visiting ClearPath (translated)",
-    "directions": ["Enter through the main entrance (translated)", "Follow the blue line on the floor (translated)", "Take the corridor (translated)", "Look for your room (translated)"],
+    "directions": ["Enter through the main entrance (translated)", "Follow the blue line on the floor (translated)", "Take the corridor indicated (translated)", "Look for your destination building (translated)"],
     "expect": ["Show your QR code or give your name at the desk (translated)", "A nurse will take your vitals (translated)", "A doctor will see you shortly after (translated)"],
     "back": "Back (translated)",
     "min": "min (translated)",
@@ -220,7 +220,20 @@ Respond ONLY with a JSON object (no markdown, no backticks) in this exact format
   }
 }
 
-Departments: rabies=dog/animal bites needing vaccine, emergency=life-threatening, pediatric=children under 12, triage=general illness.`,
+Available departments and when to use them:
+- "rabies" — dog, cat, bat, or any animal bite needing rabies vaccine
+- "emergency" — life-threatening: chest pain, difficulty breathing, stroke, severe bleeding, unconscious
+- "pediatric" — children under 18 with any condition; also maternity and labor/delivery
+- "triage" — general admitting, check-in, preadmission testing, not sure where to go
+- "atrium" — information, gift shop, cafeteria, volunteer services, non-medical needs
+- "clinicbldg" — MRI, PET scan, neuroradiology, heart/vascular aortic issues
+- "dana" — digestive health, eye issues, diabetes, bone/joint issues, cardiology
+- "ypb" — orthopedics, general surgery, nuclear medicine, transplantation
+- "north" — breast center, gynecology, operating rooms, oncology, radiology
+- "fitkin" — EEG, neurophysiology, pulmonary function, chest clinic
+- "winchester" — psychiatry, child psychiatry, Nathan Smith Clinic
+
+Respond in the same language the patient used.`,
         messages: [{ role: "user", content: situation }],
       }),
     });
@@ -239,6 +252,66 @@ Departments: rabies=dog/animal bites needing vaccine, emergency=life-threatening
       ui: null,
     });
   }
+});
+
+// Add this route to server.js before server.listen()
+
+app.get("/api/analytics", (req, res) => {
+  const today = new Date().toISOString().split("T")[0];
+
+  const totalToday = db.prepare(`
+    SELECT COUNT(*) as count FROM patients
+    WHERE date(checked_in_at) = date('now')
+  `).get().count;
+
+  const discharged = db.prepare(`
+    SELECT COUNT(*) as count FROM patients
+    WHERE status = 'discharged' AND date(checked_in_at) = date('now')
+  `).get().count;
+
+  const avgWaitByDept = db.prepare(`
+    SELECT department,
+      ROUND(AVG((julianday(called_at) - julianday(checked_in_at)) * 24 * 60), 1) as avg_wait_minutes,
+      COUNT(*) as total
+    FROM patients
+    WHERE called_at IS NOT NULL AND date(checked_in_at) = date('now')
+    GROUP BY department
+  `).all();
+
+  const urgencyBreakdown = db.prepare(`
+    SELECT urgency, COUNT(*) as count FROM patients
+    WHERE date(checked_in_at) = date('now')
+    GROUP BY urgency
+  `).all();
+
+  const byHour = db.prepare(`
+    SELECT strftime('%H', checked_in_at) as hour, COUNT(*) as count
+    FROM patients
+    WHERE date(checked_in_at) = date('now')
+    GROUP BY hour
+    ORDER BY hour ASC
+  `).all();
+
+  const languages = db.prepare(`
+    SELECT language, COUNT(*) as count FROM patients
+    WHERE date(checked_in_at) = date('now')
+    GROUP BY language
+    ORDER BY count DESC
+  `).all();
+
+  const currentlyWaiting = db.prepare(`
+    SELECT COUNT(*) as count FROM patients WHERE status = 'waiting'
+  `).get().count;
+
+  res.json({
+    totalToday,
+    discharged,
+    currentlyWaiting,
+    avgWaitByDept,
+    urgencyBreakdown,
+    byHour,
+    languages,
+  });
 });
 
 server.listen(PORT, () => console.log(`✅ ClearPath backend running on http://localhost:${PORT}`));

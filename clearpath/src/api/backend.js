@@ -58,5 +58,19 @@ export async function movePatient(id, department, room, floor) {
   return res.json();
 }
 
+export const DEPT_ROOM = {
+  rabies:     { room: "Room A3",            floor: "1" },
+  emergency:  { room: "South Pavilion",     floor: "1" },
+  pediatric:  { room: "Children's Hospital",floor: "1" },
+  triage:     { room: "East Pavilion",      floor: "1" },
+  atrium:     { room: "Atrium",             floor: "1" },
+  clinicbldg: { room: "Clinic Building",    floor: "1" },
+  dana:       { room: "Dana Building",      floor: "1" },
+  ypb:        { room: "Yale Physicians",    floor: "1" },
+  north:      { room: "North Pavilion",     floor: "1" },
+  fitkin:     { room: "Fitkin Building",    floor: "2" },
+  winchester: { room: "Winchester Building",floor: "1" },
+};
+
 export const WS_URL = "ws://localhost:3001";
 export const API_URL = API;
